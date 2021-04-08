@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState, useEffect,useCallback} from 'react'
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -7,34 +7,27 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import TextInput from './TextInput'
 
-export default class FormDialog extends React.Component {
 
-    
+const FormDialog = (props) => {
 
-    constructor(props){
-        super(props);
-
-        this.state = {
-            name: '',
-            email: '',
-            description: ''
-        }
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [description, setDescription] = useState("");
         
-        this.inputName = this.inputName.bind(this)
-        this.inputEmail = this.inputEmail.bind(this)
-        this.inputDescription = this.inputDescription.bind(this)
-    }
 
-    inputName = (event) => {
-        this.setState({name: event.target.value})
-    }
-    inputEmail = (event) => {
-        this.setState({email: event.target.value})
-    }
-    inputDescription = (event) => {
-        this.setState({description: event.target.value})
-    }
-    submitForm = () => {
+    const inputName = useCallback((event) => {
+      setName(event.target.value)
+    }, [setName]);
+
+    const inputEmail = useCallback((event) => {
+      setEmail(event.target.value)
+    }, [setEmail]);
+
+    const inputDescription = useCallback((event) => {
+      setDescription(event.target.value)
+    }, [setDescription]);
+
+    const submitForm = () => {
         const name = this.state.name
         const email = this.state.email
         const description = this.state.description
@@ -52,22 +45,20 @@ export default class FormDialog extends React.Component {
           method: 'POST',
           body: JSON.stringify(payload)
         }).then(()=> {
-          alert('送信が完了しました。追ってご連絡します。')
-          this.setState({
-            name: '',
-            email: '',
-            description: ''
-          })
-          return this.props.handleClose()
+          alert('送信が完了しました!追ってご連絡します。');
+          
+            setName("")
+            setEmail("")
+            description("")
+          
+          return props.handleClose()
         })
     }
     
-
-    render() {
         return(
             <Dialog
-        open={this.props.open}
-        onClose={this.props.handleClose}
+        open={props.open}
+        onClose={props.handleClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
@@ -76,31 +67,32 @@ export default class FormDialog extends React.Component {
           <DialogContentText component="div" id="alert-dialog-description">
             <TextInput
                 label={'お名前(必須)'} multiline={false} row={1} 
-                value={this.state.name} type={'text'} onChange={this.inputName}
+                value={name} type={'text'} onChange={inputName}
             />
             <TextInput
                 label={'メールアドレス(必須)'} multiline={false} row={1} 
-                value={this.state.email} type={'email'} onChange={this.inputEmail}
+                value={email} type={'email'} onChange={inputEmail}
             />
             <TextInput
                 label={'お問い合わせ内容(必須)'} multiline={true} row={5} 
-                value={this.state.description} type={'text'} onChange={this.inputDescription}
+                value={description} type={'text'} onChange={inputDescription}
             />
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={this.props.handleClose} color="primary">
+          <Button onClick={props.handleClose} color="primary">
             キャンセル
           </Button>
-          <Button onClick={this.submitForm} color="primary" autoFocus>
+          <Button onClick={submitForm} color="primary" autoFocus>
             送信
           </Button>
         </DialogActions>
       </Dialog>
         )
-    }
+    
 }
 
+export default FormDialog
 
 
 
